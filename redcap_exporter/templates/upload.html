@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Upload CSV
+{% endblock %}
+
+{% block content %}
+
+<h1>Convert</h1>
+<p>Upload a REDCap data export CSV and convert it to Excel</p>
+<form action='converted' method="post" enctype="multipart/form-data">
+   <label for="file">Data Export CSV</label>
+   <input type = "file" name = "file" />
+   <input type = "submit"/>
+</form>
+{% endblock %}
