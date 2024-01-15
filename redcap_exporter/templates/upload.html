@@ -5,12 +5,39 @@ Upload CSV
 {% endblock %}
 
 {% block content %}
-
+<header>
 <h1>Convert</h1>
 <p>Upload a REDCap data export CSV and convert it to Excel</p>
+</header>
+
+<div>
+<p>Mini guide:</p>
+<ol>
+   <li>Go to your REDCap project,</li>
+   <li>Go to "Data Exports, Reports, and Stats" under "Applications" in the navigation bar on the right,</li>
+   <li>Export Data as "CSV / Microsoft Excel (labels)"</li>
+   <li>Download the CSV file</li>
+   <li>Upload it here and download the Excel version with one row per patient</li>
+</ol>
+</div>
 <form action='converted' method="post" enctype="multipart/form-data">
+<!--
+
+   <p>Header with single or multiple rows</p>
+   <input type="radio" id="multi" name="columns" value="multi">
+   <label for="multi">Multiple rows</label><br>
+   <input type="radio" id="flat" name="columns" value="flat">
+   <label for="flat">Single row</label><br>
+
+   <p>Header with single or multiple rows</p>
+   <input type="radio" id="instrument" name="colorder" value="instrument">
+   <label for="instrument">Form by form</label><br>
+   <input type="radio" id="repeat" name="colorder" value="instrument">
+   <label for="repeat">Repeat by repeat</label><br>
+
+-->
    <label for="file">Data Export CSV</label>
-   <input type = "file" name = "file" />
+   <input type = "file" name = "file" /><br>
    <input type = "submit"/>
 </form>
 {% endblock %}
