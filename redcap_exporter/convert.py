@@ -2,12 +2,26 @@
 
 import pandas
 
-def convert(input_csv, output_xlsx):
-    df = pandas.read_csv(input_csv, index_col=0, dtype={0: str})
+class InternalError(RuntimeError):
+    pass
 
-    assert all(df['Repeat Instance'] != 0)
-    df['Repeat Instrument'] = df['Repeat Instrument'].fillna('Static')
-    df['Repeat Instance'] = df['Repeat Instance'].fillna(0).astype(int)
+
+def convert(input_csv, output_xlsx):
+    print('Reading input file')
+    df = pandas.read_csv(input_csv, index_col=0, dtype={0: str})#, sep=',|;', quotechar='"', **format_specific_args)
+
+    if df.index.name == 'record_id':
+        rep_instrument_col = 'redcap_repeat_instrument'
+        rep_instance_col = 'redcap_repeat_instance'
+    elif df.index.name == 'Record ID':
+        rep_instrument_col = 'Repeat Instrument'
+        rep_instance_col = 'Repeat Instance'
+    else:
+        raise InternalError('unrecognized redcap export format, is the input file an original redcap export file?')
+
+    assert all(df[rep_instance_col] != 0)
+    df[rep_instrument_col] = df[rep_instrument_col].fillna('Static')
+    df[rep_instance_col] = df[rep_instance_col].fillna(0).astype(int)
 
     # detect duplicate columns, redcap repeats column names (for instance "Complete?" for each instrument)
     likely_dups = df.columns[df.columns.str.endswith('.1')]
@@ -23,11 +37,12 @@ def convert(input_csv, output_xlsx):
                 else:
                     break
 
+    print('Splitting instruments and repeats')
     acc = {}
-    for (instr, rep), rdf in df.groupby(['Repeat Instrument', 'Repeat Instance']):
+    for (instr, rep), rdf in df.groupby([rep_instrument_col, rep_instance_col]):
         assert rep == int(rep)
         rep = int(rep)
-        rdf = rdf.drop(['Repeat Instrument', 'Repeat Instance'], axis='columns')
+        rdf = rdf.drop([rep_instrument_col, rep_instance_col], axis='columns')
         rdf = rdf.dropna(axis='columns', how='all')
         rdf = rdf.rename(columns=dedup_cols)
 
@@ -45,6 +60,7 @@ def convert(input_csv, output_xlsx):
         acc[(instr, rep)] = rdf
 
 
+    print('Merging all pieces')
     first = ('Static', 0)
     keys = sorted(acc.keys())
     keys.remove(first)
@@ -54,4 +70,7 @@ def convert(input_csv, output_xlsx):
 
     newdf = pandas.concat(sorted_acc, axis='columns')
     newdf.index.name = 'Redcap ID'
+
+    print(f'Writing Excel output, {newdf.shape[0]} rows by {newdf.shape[1]} columns')
     newdf.to_excel(output_xlsx)
+    print('DONE')
