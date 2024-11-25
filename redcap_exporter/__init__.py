@@ -41,6 +41,19 @@ def create_app():
     @app.route('/converted', methods=('POST',))
     def conversion():
         #dirpath = get_random_dir('results/')
+        sep_map = {
+            "comma": ",",
+            "tab": "\t",
+            "": ",",
+            "comma": ",",
+            "semicolon": ";",
+            "space": " ",
+            "pipe": "|",
+        }
+
+        sep_str = request.form.get('separator')
+        sep_char = sep_map[sep_str]
+
 
         if 'file' in request.files:
             file = request.files['file']
@@ -50,13 +63,13 @@ def create_app():
                 output_name = output_name[:-3] + 'xlsx'
             
             output = BytesIO()
-            convert(file.stream, output)
+            info = convert(file.stream, output, sep=sep_char)
 
             # download file
             output.seek(0)
+            #return render_template("download.html", **info)
+            # FIXME here I would like to both return the file for download without saving it but also a page with some info and a message, but I could not do it without saving the file on disk
             return send_file(output, download_name=output_name)
-            
-        #return render_template('download.html', output_name='ciccia')
 
     return app
 

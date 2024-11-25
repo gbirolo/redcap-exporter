@@ -7,7 +7,8 @@ Upload CSV
 {% block content %}
 <header>
 <h1>Convert</h1>
-<p>Upload a REDCap data export CSV and convert it to Excel</p>
+<p>Upload a REDCap data export CSV with repeating instruments and convert it to Excel</p>
+<p>
 </header>
 
 <div>
@@ -36,6 +37,14 @@ Upload CSV
    <label for="repeat">Repeat by repeat</label><br>
 
 -->
+   <label for="separator">Choose a separator:</label>
+   <select name="separator" id="separator" required>
+      <option value="comma">Comma (,)</option>
+      <option value="tab">Tab (\t)</option>
+      <option value="semicolon">Semicolon (;)</option>
+      <option value="space">Space ( )</option>
+      <option value="pipe">Pipe (|)</option>
+   </select>
    <label for="file">Data Export CSV</label>
    <input type = "file" name = "file" /><br>
    <input type = "submit"/>
